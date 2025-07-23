@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Peso de Produtos</title>
+
+    <div class="logo-container">
+    <img src="logoDKS.png" alt="Logo da Calculadora" class="logo">
+</div>
+    <style>
+
+        .logo-container {
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #8d0000; /* Cor de fundo clara para destacar a logo */
+    border-radius: 10px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+
+
+}
+
+.logo {
+    max-width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+    .logo {
+        max-width: 120px;
+    }
+}
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #060000;
+            --accent-color: #b10000;
+            --light-color: #ecf0f1;
+            --dark-color: #342a2a;
+            --error-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgb(103, 94, 94); /* Cor de fundo alterada para preto */  
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color:var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: black;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input.error, select.error {
+            border-color: var(--error-color);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: rgb(246, 246, 246);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #680000;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #050000;
+        }
+
+          th {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        tr {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+        tr:hover {
+            background-color: #9e9e9e;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: rgb(247, 249, 247) /*var(--light-color);*/
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .secondary-btn {
+            --accent-color: #b10000;
+          
+        }
+
+        .secondary-btn:hover {
+            background-color: #6c0101;
+        }
+
+        .product-management {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid  #eee;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+           
+            .input-group {
+                flex-direction: column;
+            }
+           
+            .input-field {
+                width: 100%;
+            }
+           
+            .actions {
+                flex-direction: column;
+            }
+           
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Peso de Produtos</h1>
+       
+        <div class="input-group">
+            <div class="input-field">
+                <label for="productSelect">Selecione o Produto</label>
+                <select id="productSelect">
+                    <option value="">-- Selecione um produto --</option>
+                </select>
+            </div>
+           
+            <div class="input-field">
+                <label for="productWeight">Peso Unitário (kg)</label>
+                <input type="number" id="productWeight" placeholder="0.00" step="0.01" min="0" readonly>
+            </div>
+           
+            <div class="input-field">
+                <label for="productQuantity">Quantidade</label>
+                <input type="number" id="productQuantity" placeholder="0" min="1" value="1">
+                <span id="quantityError" class="error-message"></span>
+            </div>
+        </div>
+       
+        <button id="addProduct" style="width: 100%;">Adicionar Produto</button>
+       
+        <div class="results">
+            <h2>Resumo dos Produtos</h2>
+           
+            <div id="productsTableContainer">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Peso Unitário (kg)</th>
+                            <th>Quantidade</th>
+                            <th>Peso Total (kg)</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="3">Total Geral</td>
+                            <td id="totalWeight">0.00 kg</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div id="emptyMessage" class="empty-message">Nenhum produto adicionado ainda.</div>
+            </div>
+           
+            <div class="actions">
+                <button id="clearAll" class="secondary-btn">Limpar Tudo</button>
+                <button id="exportData">Exportar Dados</button>
+            </div>
+        </div>
+       
+        <div class="product-management">
+            <h2>Gerenciamento de Produtos</h2>
+            <div id="productSuccessMessage" class="success-message" style="display: none;"></div>
+           
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="newProductName">Nome do Produto</label>
+                    <input type="text" id="newProductName" placeholder="Digite o nome do produto">
+                    <span id="nameError" class="error-message"></span>
+                </div>
+               
+                <div class="input-field">
+                    <label for="newProductWeight">Peso Unitário (kg)</label>
+                    <input type="number" id="newProductWeight" placeholder="0.00" step="0.01" min="0">
+                    <span id="weightError" class="error-message"></span>
+                </div>
+            </div>
+           
+            <div class="actions">
+                <button id="addNewProduct">Adicionar Novo Produto</button>
+                <button id="removeProduct" class="secondary-btn">Remover Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const productSelect = document.getElementById('productSelect');
+            const productWeightInput = document.getElementById('productWeight');
+            const productQuantityInput = document.getElementById('productQuantity');
+            const quantityError = document.getElementById('quantityError');
+            const addProductBtn = document.getElementById('addProduct');
+            const productsTableBody = document.getElementById('productsTableBody');
+            const totalWeightCell = document.getElementById('totalWeight');
+            const emptyMessage = document.getElementById('emptyMessage');
+            const clearAllBtn = document.getElementById('clearAll');
+            const exportDataBtn = document.getElementById('exportData');
+            const newProductNameInput = document.getElementById('newProductName');
+            const newProductWeightInput = document.getElementById('newProductWeight');
+            const nameError = document.getElementById('nameError');
+            const weightError = document.getElementById('weightError');
+            const addNewProductBtn = document.getElementById('addNewProduct');
+            const removeProductBtn = document.getElementById('removeProduct');
+            const productSuccessMessage = document.getElementById('productSuccessMessage');
+           
+            // Arrays para armazenar os produtos
+            let registeredProducts = [];
+            let selectedProducts = [];
+           
+            // 1. Função para carregar dados do localStorage
+            function loadFromLocalStorage() {
+                try {
+                    const savedProducts = localStorage.getItem('registeredProducts');
+                    const savedSelected = localStorage.getItem('selectedProducts');
+                    
+                    if (savedProducts) {
+                        registeredProducts = JSON.parse(savedProducts);
+                        // Garante que os IDs são números
+                        registeredProducts.forEach(p => p.id = Number(p.id));
+                    } else {
+                        // Dados padrão se não houver nada no localStorage
+                        registeredProducts = [
+                            { id: 1, name: "BAP PUSH 1MT", weight: 2.00 },
+                            { id: 2, name: "BAP PUSH DP 1,0 x 2,1MT", weight: 4.50 },
+                            { id: 3, name: "BAP TRAV VERT C/CHAVE", weight: 3.20 },
+                            { id: 4, name: "BAP TRAV VERT S/CHAVE", weight: 3.40 },
+                            { id: 5, name: "BAP TOUCH SP 1MT", weight: 3.50 },
+                            { id: 6, name: "BAP TOUCH DP 1MT", weight: 8.00 },
+                            { id: 7, name: "FECHADURA EMB/PUX/EMP", weight: 1.00 },
+                            { id: 8, name: "TRINCO SOBREPOR", weight: 1.00 },
+                            { id: 9, name: "TRINCO EMBUTIR", weight: 0.80 },
+                            { id: 10, name: "MAÇANETA", weight: 0.39 },
+                            { id: 11, name: "MOLA AEREA", weight: 1.50 },
+                            { id: 12, name: "SELECIONADOR", weight: 0.74 },
+                            { id: 13, name: "DOBRADIÇA SP", weight: 0.34 },
+                            { id: 14, name: "TUBO OBLONGO 1MT", weight: 0.73 },
+                            { id: 15, name: "TUBO OBLONGO 1,5MT", weight: 1.10 }
+
+
+
+
+                        ];
+                        localStorage.setItem('registeredProducts', JSON.stringify(registeredProducts));
+                    }
+                    
+                    if (savedSelected) {
+                        selectedProducts = JSON.parse(savedSelected);
+                        // Garante que os IDs são números
+                        selectedProducts.forEach(p => {
+                            p.id = Number(p.id);
+                            p.productId = Number(p.productId);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar do localStorage:', error);
+                    // Recria os dados padrão em caso de erro
+                    registeredProducts = [
+                            { id: 1, name: "BAP PUSH 1MT", weight: 2.00 },
+                            { id: 2, name: "BAP PUSH DP 1,0 x 2,1MT", weight: 4.50 },
+                            { id: 3, name: "BAP TRAV VERT C/CHAVE", weight: 3.20 },
+                            { id: 4, name: "BAP TRAV VERT S/CHAVE", weight: 3.40 },
+                            { id: 5, name: "BAP TOUCH SP 1MT", weight: 3.50 },
+                            { id: 6, name: "BAP TOUCH DP 1MT", weight: 8.00 },
+                            { id: 7, name: "FECHADURA EMB/PUX/EMP", weight: 1.00 },
+                            { id: 8, name: "TRINCO SOBREPOR", weight: 1.00 },
+                            { id: 9, name: "TRINCO EMBUTIR", weight: 0.80 },
+                            { id: 10, name: "MAÇANETA", weight: 0.39 },
+                            { id: 11, name: "MOLA AEREA", weight: 1.50 },
+                            { id: 12, name: "SELECIONADOR", weight: 0.74 },
+                            { id: 13, name: "DOBRADIÇA SP", weight: 0.34 },
+                            { id: 14, name: "TUBO OBLONGO 1MT", weight: 0.73 },
+                            { id: 15, name: "TUBO OBLONGO 1,5MT", weight: 1.10 }
+                    ];
+                    selectedProducts = [];
+                    localStorage.setItem('registeredProducts', JSON.stringify(registeredProducts));
+                }
+            }
+           
+            // 2. Função para salvar dados no localStorage
+            function saveToLocalStorage() {
+                try {
+                    localStorage.setItem('registeredProducts', JSON.stringify(registeredProducts));
+                    localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar no localStorage:', error);
+                    showProductMessage('Erro ao salvar os dados. Tente novamente.', 'error');
+                    return false;
+                }
+            }
+           
+            // 3. Função para mostrar mensagens de produto
+            function showProductMessage(message, type = 'success') {
+                productSuccessMessage.textContent = message;
+                productSuccessMessage.style.color = type === 'success' ? '#27ae60' : '#e74c3c';
+                productSuccessMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    productSuccessMessage.style.display = 'none';
+                }, 3000);
+            }
+           
+            // 4. Função para carregar os produtos no select
+            function loadProducts() {
+                productSelect.innerHTML = '<option value="">-- Selecione um produto --</option>';
+               
+                registeredProducts.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = product.name;
+                    productSelect.appendChild(option);
+                });
+            }
+           
+            // 5. Função para atualizar o peso quando um produto é selecionado
+            function updateProductWeight() {
+                const selectedId = parseInt(productSelect.value);
+                const product = registeredProducts.find(p => p.id === selectedId);
+               
+                if (product) {
+                    productWeightInput.value = product.weight.toFixed(2);
+                } else {
+                    productWeightInput.value = '';
+                }
+            }
+           
+            // 6. Função para adicionar um produto à lista de compras
+            function addSelectedProduct() {
+                clearErrors();
+                
+                const selectedId = parseInt(productSelect.value);
+                const quantity = parseInt(productQuantityInput.value);
+               
+                // Validação dos dados
+                let isValid = true;
+                
+                if (!selectedId) {
+                    showError(productSelect, quantityError, 'Por favor, selecione um produto.');
+                    isValid = false;
+                }
+                
+                if (isNaN(quantity)) {
+                    showError(productQuantityInput, quantityError, 'Por favor, informe uma quantidade válida.');
+                    isValid = false;
+                } else if (quantity <= 0) {
+                    showError(productQuantityInput, quantityError, 'A quantidade deve ser maior que zero.');
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+               
+                const product = registeredProducts.find(p => p.id === selectedId);
+               
+                // Criar objeto do produto selecionado
+                const selectedProduct = {
+                    id: Date.now(), // ID único para a linha na tabela
+                    productId: product.id,
+                    name: product.name,
+                    weight: product.weight,
+                    quantity: quantity,
+                    totalWeight: product.weight * quantity
+                };
+               
+                // Adicionar ao array
+                selectedProducts.push(selectedProduct);
+               
+                // Atualizar a tabela
+                updateTable();
+               
+                // Salvar no localStorage
+                if (saveToLocalStorage()) {
+                    // Limpar os campos de entrada
+                    productSelect.value = '';
+                    productWeightInput.value = '';
+                    productQuantityInput.value = '1';
+                    productSelect.focus();
+                }
+            }
+           
+            // 7. Função para remover um produto da lista de compras
+            function removeSelectedProduct(id) {
+                selectedProducts = selectedProducts.filter(product => product.id !== id);
+                updateTable();
+                saveToLocalStorage();
+            }
+           
+            // 8. Função para atualizar a tabela
+            function updateTable() {
+                // Limpar o corpo da tabela
+                productsTableBody.innerHTML = '';
+               
+                // Calcular o peso total
+                let grandTotal = 0;
+               
+                // Adicionar cada produto à tabela
+                selectedProducts.forEach(product => {
+                    const row = document.createElement('tr');
+                   
+                    row.innerHTML = `
+                        <td>${escapeHtml(product.name)}</td>
+                        <td>${product.weight.toFixed(2)}</td>
+                        <td>${product.quantity}</td>
+                        <td>${product.totalWeight.toFixed(2)}</td>
+                        <td><button class="remove-btn" data-id="${product.id}">Remover</button></td>
+                    `;
+                   
+                    productsTableBody.appendChild(row);
+                    grandTotal += product.totalWeight;
+                });
+               
+                // Atualizar o total geral
+                totalWeightCell.textContent = `${grandTotal.toFixed(2)} kg`;
+               
+                // Mostrar/ocultar mensagem de tabela vazia
+                if (selectedProducts.length === 0) {
+                    emptyMessage.style.display = 'block';
+                    document.querySelector('tfoot').style.display = 'none';
+                } else {
+                    emptyMessage.style.display = 'none';
+                    document.querySelector('tfoot').style.display = 'table-footer-group';
+                }
+               
+                // Adicionar eventos aos botões de remover
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const productId = parseInt(this.getAttribute('data-id'));
+                        removeSelectedProduct(productId);
+                    });
+                });
+            }
+           
+            // 9. Função para limpar todos os produtos selecionados
+            function clearAllSelectedProducts() {
+                if (selectedProducts.length === 0) return;
+                
+                if (confirm('Tem certeza que deseja remover todos os produtos?')) {
+                    selectedProducts = [];
+                    updateTable();
+                    saveToLocalStorage();
+                }
+            }
+           
+            // 10. Função para exportar os dados
+            function exportData() {
+                if (selectedProducts.length === 0) {
+                    alert('Não há dados para exportar.');
+                    return;
+                }
+               
+                let csv = 'Produto,Peso Unitário (kg),Quantidade,Peso Total (kg)\n';
+               
+                selectedProducts.forEach(product => {
+                    csv += `"${escapeCsv(product.name)}",${product.weight.toFixed(2)},${product.quantity},${product.totalWeight.toFixed(2)}\n`;
+                });
+               
+                // Adicionar total geral
+                const grandTotal = selectedProducts.reduce((sum, product) => sum + product.totalWeight, 0);
+                csv += `\nTotal Geral,,,${grandTotal.toFixed(2)}`;
+               
+                // Criar blob e fazer download
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'peso_produtos.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+           
+            // 11. Função para adicionar um novo produto ao cadastro (CORRIGIDA)
+            function addNewProduct() {
+                clearErrors();
+                
+                const name = newProductNameInput.value.trim();
+                const weight = parseFloat(newProductWeightInput.value);
+               
+                // Validação dos dados
+                let isValid = true;
+                
+                if (!name) {
+                    showError(newProductNameInput, nameError, 'Por favor, informe o nome do produto.');
+                    isValid = false;
+                }
+                
+                if (isNaN(weight)) {
+                    showError(newProductWeightInput, weightError, 'Por favor, informe um peso válido.');
+                    isValid = false;
+                } else if (weight <= 0) {
+                    showError(newProductWeightInput, weightError, 'O peso deve ser maior que zero.');
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+               
+                // Verificar se o produto já existe (case insensitive)
+                if (registeredProducts.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                    showError(newProductNameInput, nameError, 'Este produto já está cadastrado.');
+                    return;
+                }
+               
+                // Criar ID único para o novo produto
+                const newId = registeredProducts.length > 0
+                    ? Math.max(...registeredProducts.map(p => p.id)) + 1
+                    : 1;
+               
+                // Criar objeto do produto
+                const product = {
+                    id: newId,
+                    name: name,
+                    weight: weight
+                };
+               
+                // Adicionar ao array
+                registeredProducts.push(product);
+               
+                // Salvar no localStorage e atualizar a interface
+                if (saveToLocalStorage()) {
+                    // Atualizar o select
+                    loadProducts();
+                   
+                    // Limpar os campos de entrada
+                    newProductNameInput.value = '';
+                    newProductWeightInput.value = '';
+                    newProductNameInput.focus();
+                   
+                    // Feedback visual
+                    showProductMessage('Produto adicionado com sucesso!');
+                }
+            }
+           
+            // 12. Função para remover um produto do cadastro
+            function removeRegisteredProduct() {
+                clearErrors();
+                
+                const selectedId = parseInt(productSelect.value);
+               
+                if (!selectedId) {
+                    showError(productSelect, quantityError, 'Por favor, selecione um produto para remover.');
+                    return;
+                }
+               
+                if (confirm('Tem certeza que deseja remover este produto do cadastro?')) {
+                    // Verificar se o produto está em uso
+                    const isInUse = selectedProducts.some(p => p.productId === selectedId);
+                   
+                    if (isInUse) {
+                        showProductMessage('Este produto está em uso na lista de compras e não pode ser removido.', 'error');
+                        return;
+                    }
+                   
+                    // Remover o produto
+                    registeredProducts = registeredProducts.filter(p => p.id !== selectedId);
+                   
+                    // Salvar no localStorage e atualizar a interface
+                    if (saveToLocalStorage()) {
+                        // Atualizar o select
+                        loadProducts();
+                        productWeightInput.value = '';
+                       
+                        // Feedback visual
+                        showProductMessage('Produto removido com sucesso!');
+                    }
+                }
+            }
+           
+            // Funções auxiliares
+            function clearErrors() {
+                quantityError.textContent = '';
+                productQuantityInput.classList.remove('error');
+                nameError.textContent = '';
+                newProductNameInput.classList.remove('error');
+                weightError.textContent = '';
+                newProductWeightInput.classList.remove('error');
+                productSelect.classList.remove('error');
+            }
+           
+            function showError(element, errorElement, message) {
+                element.classList.add('error');
+                errorElement.textContent = message;
+            }
+           
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+            
+            function escapeCsv(unsafe) {
+                return unsafe.replace(/"/g, '""');
+            }
+           
+            // Event Listeners
+            productSelect.addEventListener('change', updateProductWeight);
+            addProductBtn.addEventListener('click', addSelectedProduct);
+            clearAllBtn.addEventListener('click', clearAllSelectedProducts);
+            exportDataBtn.addEventListener('click', exportData);
+            addNewProductBtn.addEventListener('click', addNewProduct);
+            removeProductBtn.addEventListener('click', removeRegisteredProduct);
+           
+            // Permitir adicionar com Enter
+            productQuantityInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addSelectedProduct();
+            });
+           
+            newProductNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addNewProduct();
+            });
+           
+            newProductWeightInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addNewProduct();
+            });
+           
+            // Inicializar
+            loadFromLocalStorage();
+            loadProducts();
+            updateTable();
+        });
+    </script>
+</body>
+</html>
